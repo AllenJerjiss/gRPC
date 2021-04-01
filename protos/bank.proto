@@ -1,0 +1,20 @@
+//python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/bank.proto
+syntax = "proto3";
+
+package unary;
+
+service BankMicroService{
+    rpc MsgDelivery(Message) returns (MessageResponse) {}
+
+}
+
+message Message{
+    string message = 1;
+}
+
+message MessageResponse{
+    string message = 1;
+    int32 balance = 2;
+    bool received = 3;
+
+}
