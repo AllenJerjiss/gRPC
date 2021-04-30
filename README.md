@@ -1,4 +1,4 @@
-# gRPC project for CSE531 @ASU
+# project 2 for CSE531 @ASU:  Logical Clocks
 
 Prerequsites:
 
