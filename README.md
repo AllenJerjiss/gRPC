@@ -21,23 +21,17 @@ Setup:
 
 Problem statement:
 
-The problem to solve in this project is to build a distributed banking system that allows multiple customers to withdraw or deposit money from the multiple branches of a bank, for a simplified version of what the real life scenario would be..  Our goal is simplified versus a realistic scenario as we do not account for concurrent updates to the same account and we limit each customer to access money from their home branch only.  Albeit this simplification, the bank ledger needs to be replicated across all branches as one would expect in a real life scenario. 
+The problem to solve in this to build on top of the first gRPC project; A distributed banking system that allows multiple customers to withdraw or deposit money from the multiple branches of a bank.  The first version of this project did not take into account the problem of the lack of a global clock, which can lead to consistency problems when the multiple branches are synchronizing the customer interactions, as preserving the order of events in a distributed system are critical and, in this case, can lead to discrepancies between the different local data replicas at each branch.  For instance, if customer A deposits 100 dollars and then withdraws 50 versus if they first withdrew the money and then deposited it, since depending on their balance, the latter example might lead to an insufficient funds scenario while the former example does not.  In this project we implement Lamport's logical clock algorithm upon the first project to solve the problem herein.
+
 
 Goal:
 
-In order to achieve the objective stated in the problem statement, the goal of this project is to implement the communication between the customer and the bank’s branches using gRPC by implementing the interfaces for querying, depositing, and withdrawing money between the customer and branch interactions.  In addition, we use the same technology to implement the syncing of the ledger between the branches by implementing interfaces for propagating deposits and withdrawals amongst the banks’ branches. 
+As noted in the problem statement, the overall goal of this project is to implement Lamport's logical clock algorithm to solve the inherent problem due to the lack of a global clock. In order to do this, we need to implement sub-interfaces in the Customer and Branch code to account for keeping track of the local time as well as the Lamport's time.  We do this by incrementing the local counter before we send the data.  When we receive the data, we take the max of the local counter of the receiver and compare it with that of the Lamport's time and increment it. 
 
-Progress:
+Implementation Process:
 
-So far my progress has included:
-1.  Creating the proto buffer using the uniary mode and compling it to provide an interface for the communication
-2.  Spinning up processes dynamically based on the number of branches for a given bank
-3.  Processing a message from the Customer and sending it to the correct port corresponding to the branch ID.
-4.  Determening the type of interaction and the boilerplate for processing all 3 types of supported operations;  query, depsit, withdraw.
+The first task was to update the Bank.proto to reflect the new Lamport's logical clock in order to be able to send the value between the Branch and Customer processes.  
 
+I went ahead and then implemented a local counter in both of the processes to keep track of a counter representative of the local time for each process, starting at time 0.    
 
-TODO:
-1.  Persist the result of operations and calcualte depsoit and withdraw amounts based on it.
-2.  Data syncronization between branches
-3.  formatting of the oputput to project specifications
-
+I then went on to update the counter when sending a message, which in my implementation happens from Customer.py by making sure the Lamport's counter increments the local counter by one every time it sends a message.  Vice versa, I went on to update the counter in Branch.py, but this time instead of simply incrementing the local counter and setting as the Lamport time, I compare the reciever and sender's values, and set the Lamport's counter to increment based on that value.
