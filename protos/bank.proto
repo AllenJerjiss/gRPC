@@ -10,11 +10,13 @@ service BankMicroService{
 
 message Message{
     string message = 1;
+    int32 lamportCounter = 2;
 }
 
 message MessageResponse{
     string message = 1;
     int32 balance = 2;
     bool received = 3;
+    int32 lamportCounter = 4;
 
 }

@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\nbank.proto\x12\x05unary\"\x1a\n\x07Message\x12\x0f\n\x07message\x18\x01 \x01(\t\"E\n\x0fMessageResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0f\n\x07\x62\x61lance\x18\x02 \x01(\x05\x12\x10\n\x08received\x18\x03 \x01(\x08\x32K\n\x10\x42\x61nkMicroService\x12\x37\n\x0bMsgDelivery\x12\x0e.unary.Message\x1a\x16.unary.MessageResponse\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\nbank.proto\x12\x05unary\"2\n\x07Message\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x16\n\x0elamportCounter\x18\x02 \x01(\x05\"]\n\x0fMessageResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0f\n\x07\x62\x61lance\x18\x02 \x01(\x05\x12\x10\n\x08received\x18\x03 \x01(\x08\x12\x16\n\x0elamportCounter\x18\x04 \x01(\x05\x32K\n\x10\x42\x61nkMicroService\x12\x37\n\x0bMsgDelivery\x12\x0e.unary.Message\x1a\x16.unary.MessageResponse\"\x00\x62\x06proto3'
 )
 
 
@@ -40,6 +40,13 @@ _MESSAGE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='lamportCounter', full_name='unary.Message.lamportCounter', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -53,7 +60,7 @@ _MESSAGE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=21,
-  serialized_end=47,
+  serialized_end=71,
 )
 
 
@@ -86,6 +93,13 @@ _MESSAGERESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='lamportCounter', full_name='unary.MessageResponse.lamportCounter', index=3,
+      number=4, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -98,8 +112,8 @@ _MESSAGERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=49,
-  serialized_end=118,
+  serialized_start=73,
+  serialized_end=166,
 )
 
 DESCRIPTOR.message_types_by_name['Message'] = _MESSAGE
@@ -129,8 +143,8 @@ _BANKMICROSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=120,
-  serialized_end=195,
+  serialized_start=168,
+  serialized_end=243,
   methods=[
   _descriptor.MethodDescriptor(
     name='MsgDelivery',

@@ -26,13 +26,18 @@ class BranchService(pb2_grpc.BankMicroServiceServicer):
         # a list of received messages used for debugging purpose
         self.recvMsg = list()
         self.Request = []
+        self.localCounter = 1
 
 
     def MsgDelivery(self, request, context):
         #ensure that one message is processed at the same time by obtaining a lock
         lock = threading.Lock()
         with lock:
+            self.localCounter += 1
             message = request.message
+            lamportCounter = request.lamportCounter
+            lamportCounter = max(self.localCounter, lamportCounter) + 1
+            #print("recieve %s" % lamportCounter)
             money = re.search('\'money\': (.+?)}', message)
             if 'query' in message:
                 if money:
@@ -47,7 +52,7 @@ class BranchService(pb2_grpc.BankMicroServiceServicer):
                     #todo:  create class dict to store balance and update based on action
                     balance = str(400 - int(money.group(1)))
 
-        result = {'message': balance, 'received': True}
+        result = {'message': balance,'lamportCounter': lamportCounter,'received': True}
         time.sleep(1)
         return pb2.MessageResponse(**result)
 
@@ -63,6 +68,7 @@ def bankServer(branch_id,balance):
 
 
 if __name__ == '__main__':
+    localCounter = 0
     balance = []
     processes = []
     with open("./input.json", 'r') as file:
@@ -70,6 +76,7 @@ if __name__ == '__main__':
     for interaction in interactions:
         #branch sync interaction should be handled by the server side Branch code
         if interaction["type"] == "branch":
+            localCounter +=1
             balance.append({"id":interaction["id"], "balance":interaction["balance"]})
     for interaction in interactions:
         processes = []

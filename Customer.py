@@ -26,11 +26,14 @@ class Customer(object):
         # bind the client and the server
         self.stub = pb2_grpc.BankMicroServiceStub(self.channel)
 
-    def transaction(self, message):
+    def transaction(self, message,localCounter):
         message = pb2.Message(message=message)
+        lamportCounter = pb2.Message(lamportCounter=localCounter)
+        print("send %s" %lamportCounter)
         return self.stub.MsgDelivery(message)
 
 if __name__ == '__main__':
+    localCounter = 0
     output = {}
     interfaces = []
     with open("./input.json", 'r') as file:
@@ -43,6 +46,8 @@ if __name__ == '__main__':
                 for event in interaction["events"]:
                     id = int(interaction["id"])
                     client = Customer(id)
-                    result = client.transaction(message=str(event))
+                    #increment the local counter with each send request
+                    localCounter +=1
+                    result = client.transaction(message=str(event),localCounter=localCounter)
                     interface = event['interface']
                     print(f'id: {id}, interface: {interface}, balance: {result}')
