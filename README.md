@@ -1,4 +1,4 @@
-# gRPC project for CSE531 @ASU
+# project 3 for CSE531 @ASU:  Client-Centric Consistency
 
 Prerequsites:
 
@@ -21,23 +21,27 @@ Setup:
 
 Problem statement:
 
-The problem to solve in this project is to build a distributed banking system that allows multiple customers to withdraw or deposit money from the multiple branches of a bank, for a simplified version of what the real life scenario would be..  Our goal is simplified versus a realistic scenario as we do not account for concurrent updates to the same account and we limit each customer to access money from their home branch only.  Albeit this simplification, the bank ledger needs to be replicated across all branches as one would expect in a real life scenario. 
+The problem to solve in this project is built on top of the first gRPC project; A distributed banking system that allows multiple customers to withdraw or deposit money from the multiple branches of a bank.  Here we implement a couple of examples of client-centric consistencies in order to make sure the transactions are recorder in the correct order across the different replicas for any interactions for a given "client", which in this case is the customer.  With the enforcement of the client-centric consistency checks, we are able to remove the limitation where in the first project a customer was only allowed to interact with one specific bank branch.
 
 Goal:
 
-In order to achieve the objective stated in the problem statement, the goal of this project is to implement the communication between the customer and the bank’s branches using gRPC by implementing the interfaces for querying, depositing, and withdrawing money between the customer and branch interactions.  In addition, we use the same technology to implement the syncing of the ledger between the branches by implementing interfaces for propagating deposits and withdrawals amongst the banks’ branches. 
+In order to achieve the objective stated in the problem statement, the goal of this project is to implement the "Monotonic Writes" and "Read your Writes" policies in order to enforce client-centric consistency for the bank's customers.
 
-Progress:
+"Monotonic Writes" ensure that when a specific process performs a write operation in a specific order, that it is replicated across all other processes in the same exact order. 
 
-So far my progress has included:
-1.  Creating the proto buffer using the uniary mode and compling it to provide an interface for the communication
-2.  Spinning up processes dynamically based on the number of branches for a given bank
-3.  Processing a message from the Customer and sending it to the correct port corresponding to the branch ID.
-4.  Determening the type of interaction and the boilerplate for processing all 3 types of supported operations;  query, depsit, withdraw.
+"Read your Writes" is another way to ensure consistency across the replicas, and it mandates that when a transactions is performed by the customer process, that any subsequent transaction is able to work from the latest updated version as the starting point. 
 
 
-TODO:
-1.  Persist the result of operations and calcualte depsoit and withdraw amounts based on it.
-2.  Data syncronization between branches
-3.  formatting of the oputput to project specifications
+Implementation Process:
+
+The first thing to tackle is to remove the constraint that a given customer can only interact with a specific branch, instead here a customer can access any branch.  We do this by removing the tight coupling done in Customer.py which bound a customer to a specific Id. 
+
+The next step is to update the branch.proto to account for not only sending the message, but the writesets as well in both sending and receiving operations.
+
+We also need to do work in order to make sure that we are not only sending the writeset to the Branch, rather we also maintain the local writeset of operations as we will use that information in order to implement the two different consistency models.
+
+For "Monotonic Writes" we keep track of the writesets of a given customer interaction by pushing each action into a queue as they come in.  When we call the process to synchronize the data across the different branches, we will make sure to process the queue in the FIFO fashion, thereby on each branch, thereby abiding by the Monotonic write principal. 
+
+For "Read Your Writes" consistency, we rely on Lamport's logical clock and maintain a dictionary which maps a customer's ID and the last updated timetamp whenever a Customer does an update.  We then build this check into the query operation, which is performed at the start of a deposit or withdrawal operation as well.  If we find the dictionary to have an entry for any given replica with a larger logical time than our processes, we first adjust the current balance to match across the rest of the replicas and then attempt either the deposit or withdrawal operations.
+
 
